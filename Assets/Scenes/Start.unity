@@ -324,6 +324,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7737208981546657061}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &1937877949 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8416918937957670042, guid: c84660df41b80bb4cac2abacbfa43585,
+    type: 3}
+  m_PrefabInstance: {fileID: 7737208981546657061}
+  m_PrefabAsset: {fileID: 0}
 --- !u!50 &1937877952
 Rigidbody2D:
   serializedVersion: 4
@@ -344,7 +350,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &1937877953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -357,6 +363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c3cf60c5a826f54c8d71cd87079e480, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 1937877949}
 --- !u!70 &1937877954
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
