@@ -10,28 +10,29 @@ public class PlayerController : MonoBehaviour
     bool isGrounded = true;
     float horizontal = 0.0f;
     float xMovement = 0.0f;
-    float jumpForce = 0.0f;
+    float vertical = 0.0f;
+    float yMovement = 0.0f;
     float crouchingHeightRatio = 0.6f;
     float crouchingWidthSizeRatio = 0.7f;
     float crouchingWidthOffsetRatio = .025f;
     Vector2 colliderOffsetOriginal = Vector2.zero;
     Vector2 colliderSizeOriginal = Vector2.zero;
 
-    float jumpingHeightRatio = 0.7f;
-    float afterJumpWaitInSeconds = 0.4f;
-
     public LayerMask groundLayer;
-    public float groundCheckDistance = 0.1f;
+    public float groundCheckDistance = 0.001f;
 
     public Animator animator;
     private CapsuleCollider2D capsuleCollider2D;
+    private Rigidbody2D rb;
 
     public float moveSpeed = 1.0f;
+    public float jumpForce = 1.0f;
 
 
     void Start()
     {
         capsuleCollider2D = GetComponent<CapsuleCollider2D>();
+        rb = GetComponent<Rigidbody2D>();
         colliderSizeOriginal = capsuleCollider2D.size;
         colliderOffsetOriginal = capsuleCollider2D.offset;
     }
@@ -43,26 +44,23 @@ public class PlayerController : MonoBehaviour
 
     private void PlayerMovement()
     {
+        // Left and Right Movements
         horizontal = Input.GetAxisRaw("Horizontal");
         PlayerFacingDirection();
-        xMovement = transform.position.x + (horizontal * moveSpeed * Time.deltaTime);
-        transform.position = new Vector3(xMovement, transform.position.y, 0.0f);
+        xMovement =  horizontal * moveSpeed * Time.deltaTime;
+        transform.position = new Vector3(transform.position.x + xMovement, transform.position.y, 0.0f);
         animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
 
+        // Jump Movement
         isGrounded = GroundCheck();
-
-        if (Input.GetAxisRaw("Vertical") > 0.0f && isGrounded && !isCrouching && jumpForce == 0.0f)
+        vertical = Input.GetAxisRaw("Vertical");
+        yMovement = vertical * jumpForce;
+        if (vertical  > 0.0f && isGrounded && !isCrouching)
         {
-            jumpForce = afterJumpWaitInSeconds;
-            capsuleCollider2D.transform.position = new Vector3(capsuleCollider2D.transform.position.x, capsuleCollider2D.transform.position.y + jumpingHeightRatio, 0.0f);
+            rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Force);
+            rb.velocity = new Vector2(rb.velocity.x, 0f);
         }
-        jumpForce -= Time.deltaTime;
-        if (jumpForce < 0.0f && !isCrouching)
-        {
-            jumpForce = 0.0f;
-        }
-        
-        animator.SetFloat("jumpForce", jumpForce);
+        animator.SetFloat("jumpForce", vertical);
     }
 
     private void PlayerCrouch()
