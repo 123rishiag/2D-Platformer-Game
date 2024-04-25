@@ -8,7 +8,8 @@ public class PlayerController : MonoBehaviour
     bool isFacingLeft = false;
     bool isCrouching = false;
     bool isGrounded = true;
-    float moveSpeed = 0.0f;
+    float horizontal = 0.0f;
+    float xMovement = 0.0f;
     float jumpForce = 0.0f;
     float crouchingHeightRatio = 0.6f;
     float crouchingWidthSizeRatio = 0.7f;
@@ -25,6 +26,8 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     private CapsuleCollider2D capsuleCollider2D;
 
+    public float moveSpeed = 1.0f;
+
 
     void Start()
     {
@@ -34,7 +37,17 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
-        moveSpeed = Input.GetAxisRaw("Horizontal");
+        PlayerMovement();
+        PlayerCrouch();
+    }
+
+    private void PlayerMovement()
+    {
+        horizontal = Input.GetAxisRaw("Horizontal");
+        PlayerFacingDirection();
+        xMovement = transform.position.x + (horizontal * moveSpeed * Time.deltaTime);
+        transform.position = new Vector3(xMovement, transform.position.y, 0.0f);
+        animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
 
         isGrounded = GroundCheck();
 
@@ -48,9 +61,12 @@ public class PlayerController : MonoBehaviour
         {
             jumpForce = 0.0f;
         }
-    
-        animator.SetFloat("jumpForce", jumpForce);       
+        
+        animator.SetFloat("jumpForce", jumpForce);
+    }
 
+    private void PlayerCrouch()
+    {
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             isCrouching = !isCrouching;
@@ -59,26 +75,28 @@ public class PlayerController : MonoBehaviour
                 capsuleCollider2D.size = new Vector2(capsuleCollider2D.size.x / crouchingWidthSizeRatio, capsuleCollider2D.size.y * crouchingHeightRatio);
                 capsuleCollider2D.offset = new Vector2(capsuleCollider2D.offset.x / crouchingWidthOffsetRatio, capsuleCollider2D.offset.y * crouchingHeightRatio);
             }
-            else {
+            else
+            {
                 capsuleCollider2D.size = colliderSizeOriginal;
                 capsuleCollider2D.offset = colliderOffsetOriginal;
             }
             animator.SetBool("isCrouching", isCrouching);
         }
+    }
 
-
-        if (moveSpeed < 0.0f)
+    private void PlayerFacingDirection()
+    {
+        if (horizontal < 0.0f)
         {
-            moveSpeed *= -1f;
             if (!isFacingLeft)
             {
                 transform.Rotate(0, 180, 0);
             }
             isFacingLeft = true;
-           
+
         }
 
-        else if (moveSpeed > 0.0f)
+        else if (horizontal > 0.0f)
         {
             if (isFacingLeft)
             {
@@ -86,9 +104,6 @@ public class PlayerController : MonoBehaviour
             }
             isFacingLeft = false;
         }
-
-        animator.SetFloat("moveSpeed", moveSpeed);
-
     }
 
     bool GroundCheck()
