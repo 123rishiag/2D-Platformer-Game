@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 1179818260}
   - component: {fileID: 1179818259}
   - component: {fileID: 1179818261}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -363,6 +363,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c3cf60c5a826f54c8d71cd87079e480, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheckDistance: 0.1
   animator: {fileID: 1937877949}
 --- !u!70 &1937877954
 CapsuleCollider2D:
@@ -390,6 +394,16 @@ PrefabInstance:
     - target: {fileID: 3116827646011152573, guid: c84660df41b80bb4cac2abacbfa43585,
         type: 3}
       propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 3116827646011152573, guid: c84660df41b80bb4cac2abacbfa43585,
+        type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3116827646011152573, guid: c84660df41b80bb4cac2abacbfa43585,
+        type: 3}
+      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 3322955326148557986, guid: c84660df41b80bb4cac2abacbfa43585,
