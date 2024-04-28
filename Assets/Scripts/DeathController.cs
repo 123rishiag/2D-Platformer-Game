@@ -9,7 +9,8 @@ public class DeathController : MonoBehaviour
     {
         if (collision.gameObject.GetComponent<PlayerController>() != null)
         {
-            SceneManager.LoadScene("Start");
+            int currentSceneIndex = SceneManager.GetActiveScene( ).buildIndex;
+            SceneManager.LoadScene( currentSceneIndex );
         }
     }
 }
