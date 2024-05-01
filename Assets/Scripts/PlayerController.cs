@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
+using UnityEngine.Purchasing;
 
 public class PlayerController : MonoBehaviour
 {
@@ -27,6 +29,8 @@ public class PlayerController : MonoBehaviour
 
     public float moveSpeed = 1.0f;
     public float jumpForce = 1.0f;
+
+    public ScoreController scoreController;
 
 
     void Start()
@@ -111,5 +115,11 @@ public class PlayerController : MonoBehaviour
 
         // If the ray hits something on the ground layer, return true
         return hit.collider != null;
+    }
+
+    internal void PickupKey()
+    {
+        scoreController.IncreaseScore(10);
+        Debug.Log("Picked up Key");
     }
 }
