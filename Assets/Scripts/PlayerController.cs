@@ -120,6 +120,5 @@ public class PlayerController : MonoBehaviour
     internal void PickupKey()
     {
         scoreController.IncreaseScore(10);
-        Debug.Log("Picked up Key");
     }
 }
