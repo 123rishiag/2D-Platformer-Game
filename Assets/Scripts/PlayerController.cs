@@ -7,16 +7,16 @@ using UnityEngine.Purchasing;
 
 public class PlayerController : MonoBehaviour
 {
-    bool isFacingLeft = false;
-    bool isCrouching = false;
-    bool isGrounded = true;
-    float horizontal = 0.0f;
-    float xMovement = 0.0f;
-    float vertical = 0.0f;
-    float yMovement = 0.0f;
-    float crouchingHeightRatio = 0.6f;
-    float crouchingWidthSizeRatio = 0.7f;
-    float crouchingWidthOffsetRatio = .025f;
+    private bool isFacingLeft = false;
+    private bool isCrouching = false;
+    private bool isGrounded = true;
+    private float horizontal = 0.0f;
+    private float xMovement = 0.0f;
+    private float vertical = 0.0f;
+    private float yMovement = 0.0f;
+    private float crouchingHeightRatio = 0.6f;
+    private float crouchingWidthSizeRatio = 0.7f;
+    private float crouchingWidthOffsetRatio = .025f;
     Vector2 colliderOffsetOriginal = Vector2.zero;
     Vector2 colliderSizeOriginal = Vector2.zero;
 
