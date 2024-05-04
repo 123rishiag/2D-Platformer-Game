@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 541553305779618062}
   - component: {fileID: 541553305779618059}
   - component: {fileID: 148999669}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Chomper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,5 +158,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5bf4fb156f9a884cafd9cf2cdc54eef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patrolDistance: 4
+  patrolDistance: 5
   moveSpeed: 2
