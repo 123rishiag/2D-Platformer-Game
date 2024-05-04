@@ -9,7 +9,8 @@ public class LevelOverController : MonoBehaviour
     {
         if(collision.gameObject.GetComponent<PlayerController>() != null)
         {
-            SceneManager.LoadScene("Level 1");
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SceneManager.LoadScene(currentSceneIndex+1);
         }
     }
 }

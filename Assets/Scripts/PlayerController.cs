@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
 using UnityEngine.Purchasing;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     private bool isFacingLeft = false;
     private bool isCrouching = false;
     private bool isGrounded = true;
+    private int currentHealth = 0;
     private float horizontal = 0.0f;
     private float xMovement = 0.0f;
     private float vertical = 0.0f;
@@ -17,8 +19,8 @@ public class PlayerController : MonoBehaviour
     private float crouchingHeightRatio = 0.6f;
     private float crouchingWidthSizeRatio = 0.7f;
     private float crouchingWidthOffsetRatio = .025f;
-    Vector2 colliderOffsetOriginal = Vector2.zero;
-    Vector2 colliderSizeOriginal = Vector2.zero;
+    private Vector2 colliderOffsetOriginal = Vector2.zero;
+    private Vector2 colliderSizeOriginal = Vector2.zero;
 
     public LayerMask groundLayer;
     public float groundCheckDistance = 0.001f;
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour
     private CapsuleCollider2D capsuleCollider2D;
     private Rigidbody2D rb;
 
+    public int maxHealth = 3;
     public float moveSpeed = 1.0f;
     public float jumpForce = 1.0f;
 
@@ -39,6 +42,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         colliderSizeOriginal = capsuleCollider2D.size;
         colliderOffsetOriginal = capsuleCollider2D.offset;
+        currentHealth = maxHealth;
     }
     void Update()
     {
@@ -46,25 +50,60 @@ public class PlayerController : MonoBehaviour
         PlayerCrouch();
     }
 
+    public int GetHealth()
+    {
+        return currentHealth;
+    }
+    public void DecreaseHealth() 
+    {
+        if (currentHealth > 0) {
+            currentHealth -= 1;
+        }
+        if(currentHealth > 0)
+        {
+            animator.SetTrigger("isHurt");
+        }
+        else
+        {
+            KillPlayer();
+        }
+    }
+    private void KillPlayer()
+    {
+        animator.SetTrigger("isDead");
+    }
+    private void ReturntoIdle()
+    {
+        animator.SetTrigger("isIdle");
+    }
+    private void ReloadScene()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex);
+    }
+
     private void PlayerMovement()
     {
         // Left and Right Movements
         horizontal = Input.GetAxisRaw("Horizontal");
         PlayerFacingDirection();
-        xMovement =  horizontal * moveSpeed * Time.deltaTime;
-        transform.position = new Vector3(transform.position.x + xMovement, transform.position.y, 0.0f);
-        animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
+        xMovement = horizontal * moveSpeed * Time.deltaTime;
+        if (!isCrouching)
+        { 
+            transform.position = new Vector3(transform.position.x + xMovement, transform.position.y, 0.0f);
+            animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
 
-        // Jump Movement
-        isGrounded = GroundCheck();
-        vertical = Input.GetAxisRaw("Vertical");
-        yMovement = vertical * jumpForce;
-        if (vertical  > 0.0f && isGrounded && !isCrouching)
-        {
-            rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Force);
-            rb.velocity = new Vector2(rb.velocity.x, 0f);
+            // Jump Movement
+            isGrounded = GroundCheck();
+            vertical = Input.GetAxisRaw("Vertical");
+            yMovement = vertical * jumpForce;
+            if (vertical > 0.0f && isGrounded)
+            {
+                rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Force);
+                rb.velocity = new Vector2(rb.velocity.x, 0f);
+            }
+            animator.SetFloat("jumpForce", vertical);
         }
-        animator.SetFloat("jumpForce", vertical);
     }
 
     private void PlayerCrouch()

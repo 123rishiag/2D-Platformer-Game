@@ -29,6 +29,20 @@ public class ChomperController : MonoBehaviour
 
     private void Update()
     {
+        ChomperMovement();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.GetComponent<PlayerController>() != null) {
+            {
+                PlayerController playercontroller = collision.gameObject.GetComponent<PlayerController>();
+                playercontroller.DecreaseHealth();
+            }
+        }
+    }
+    private void ChomperMovement()
+    {
         // Calculate the left and right patrol points based on the original position
         float leftPoint = originalPosition.x - patrolDistance / 2f;
         float rightPoint = originalPosition.x + patrolDistance / 2f;
@@ -53,6 +67,6 @@ public class ChomperController : MonoBehaviour
                 transform.Rotate(0, 180, 0);
             }
         }
-            animator.SetFloat("moveSpeed",moveSpeed);
+        animator.SetFloat("moveSpeed", moveSpeed);
     }
 }
