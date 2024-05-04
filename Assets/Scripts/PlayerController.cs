@@ -79,6 +79,8 @@ public class PlayerController : MonoBehaviour
     }
     private void ReloadMenu()
     {
+        animator.enabled = false;
+        this.enabled = false;
         gameOverController.ReloadMenu();
     }
 
