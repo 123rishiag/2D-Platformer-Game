@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 1.0f;
 
     public ScoreController scoreController;
+    public GameOverController gameOverController;
 
 
     void Start()
@@ -76,10 +77,9 @@ public class PlayerController : MonoBehaviour
     {
         animator.SetTrigger("isIdle");
     }
-    private void ReloadScene()
+    private void ReloadMenu()
     {
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex);
+        gameOverController.ReloadMenu();
     }
 
     private void PlayerMovement()
