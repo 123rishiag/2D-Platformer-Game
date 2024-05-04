@@ -163,6 +163,7 @@ MonoBehaviour:
     m_Bits: 64
   groundCheckDistance: 0.001
   animator: {fileID: 8416918937957670042}
+  maxHealth: 3
   moveSpeed: 4
   jumpForce: 500
   scoreController: {fileID: 0}
