@@ -11,6 +11,7 @@ public class LevelLoader : MonoBehaviour
 {
     private Button button;
     public string buttonType;
+    public GameObject levelLockedImage;
 
     private void Awake()
     {
@@ -21,12 +22,34 @@ public class LevelLoader : MonoBehaviour
     {
         if (buttonType == "Level")
         {
-            int index = transform.GetSiblingIndex();
-            SceneManager.LoadScene(index + 1);
+            int levelIndex = transform.GetSiblingIndex();
+            LevelStatus levelStatus = LevelManager.Instance.GetLevelStatus(levelIndex+1);
+            switch (levelStatus)
+            {
+                case LevelStatus.Locked:
+                    ShowLevelLockedNotification();
+                    break;
+                case LevelStatus.Unlocked:
+                case LevelStatus.Completed:
+                    SceneManager.LoadScene(levelIndex + 1);
+                    break;
+            }
         }
         else if (buttonType == "Back")
         {
             SceneManager.LoadScene(0);
         }
+    }
+
+    public void ShowLevelLockedNotification()
+    {
+        StartCoroutine(DisplayLevelLockedNotification());
+    }
+
+    IEnumerator DisplayLevelLockedNotification()
+    {
+        levelLockedImage.SetActive(true);
+        yield return new WaitForSeconds(1.0f);
+        levelLockedImage.SetActive(false);
     }
 }
