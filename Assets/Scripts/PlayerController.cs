@@ -36,7 +36,6 @@ public class PlayerController : MonoBehaviour
     public ScoreController scoreController;
     public GameOverController gameOverController;
 
-
     void Start()
     {
         capsuleCollider2D = GetComponent<CapsuleCollider2D>();
@@ -83,7 +82,6 @@ public class PlayerController : MonoBehaviour
         this.enabled = false;
         gameOverController.ReloadMenu();
     }
-
     private void PlayerMovement()
     {
         // Left and Right Movements
@@ -107,7 +105,6 @@ public class PlayerController : MonoBehaviour
             animator.SetFloat("jumpForce", vertical);
         }
     }
-
     private void PlayerCrouch()
     {
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -126,7 +123,6 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isCrouching", isCrouching);
         }
     }
-
     private void PlayerFacingDirection()
     {
         if (horizontal < 0.0f)
@@ -148,7 +144,6 @@ public class PlayerController : MonoBehaviour
             isFacingLeft = false;
         }
     }
-
     bool GroundCheck()
     {
         // Cast a ray downward to check for ground
