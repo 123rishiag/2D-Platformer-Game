@@ -158,5 +158,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5bf4fb156f9a884cafd9cf2cdc54eef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patrolDistance: 5
+  patrolDistance: 10
   moveSpeed: 2

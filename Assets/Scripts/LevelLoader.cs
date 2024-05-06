@@ -49,7 +49,7 @@ public class LevelLoader : MonoBehaviour
     IEnumerator DisplayLevelLockedNotification()
     {
         levelLockedImage.SetActive(true);
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(1.5f);
         levelLockedImage.SetActive(false);
     }
 }
