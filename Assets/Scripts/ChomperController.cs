@@ -48,7 +48,7 @@ public class ChomperController : MonoBehaviour
         float rightPoint = originalPosition.x + patrolDistance / 2f;
 
         directionFactor = isMovingRight ? 1 : -1;
-
+        SoundManager.Instance.PlayEffect(SoundType.ChomperMove);
         if (isMovingRight)
         {
             transform.Translate(Vector2.right * directionFactor * moveSpeed * Time.deltaTime);

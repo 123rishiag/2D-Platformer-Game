@@ -36,6 +36,7 @@ public class LevelManager : MonoBehaviour
     }
     public void CompleteAndUnlockScene()
     {
+        SoundManager.Instance.PlayEffect(SoundType.ButtonClick);
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         LevelManager.Instance.SetLevelStatus(currentSceneIndex, LevelStatus.Completed);
         if ((currentSceneIndex + 1) < SceneManager.sceneCountInBuildSettings)

@@ -61,6 +61,7 @@ public class PlayerController : MonoBehaviour
         }
         if(currentHealth > 0)
         {
+            SoundManager.Instance.PlayEffect(SoundType.PlayerHurt);
             animator.SetTrigger("isHurt");
         }
         else
@@ -70,6 +71,7 @@ public class PlayerController : MonoBehaviour
     }
     private void KillPlayer()
     {
+        SoundManager.Instance.PlayEffect(SoundType.PlayerDeath);
         animator.SetTrigger("isDead");
     }
     private void ReturntoIdle()
@@ -87,9 +89,13 @@ public class PlayerController : MonoBehaviour
         // Left and Right Movements
         horizontal = Input.GetAxisRaw("Horizontal");
         PlayerFacingDirection();
-        xMovement = horizontal * moveSpeed * Time.deltaTime;
         if (!isCrouching)
-        { 
+        {
+            xMovement = horizontal * moveSpeed * Time.deltaTime;
+            if (xMovement != 0.0f)
+            {
+                SoundManager.Instance.PlayEffect(SoundType.PlayerMove);
+            }
             transform.position = new Vector3(transform.position.x + xMovement, transform.position.y, 0.0f);
             animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
 
@@ -99,6 +105,7 @@ public class PlayerController : MonoBehaviour
             yMovement = vertical * jumpForce;
             if (vertical > 0.0f && isGrounded)
             {
+                SoundManager.Instance.PlayEffect(SoundType.PlayerJump);
                 rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Force);
                 rb.velocity = new Vector2(rb.velocity.x, 0f);
             }
@@ -155,6 +162,7 @@ public class PlayerController : MonoBehaviour
 
     internal void PickupKey()
     {
+        SoundManager.Instance.PlayEffect(SoundType.ItemPickup);
         scoreController.IncreaseScore(10);
     }
 }

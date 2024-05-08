@@ -27,16 +27,19 @@ public class LevelLoader : MonoBehaviour
             switch (levelStatus)
             {
                 case LevelStatus.Locked:
+                    SoundManager.Instance.PlayEffect(SoundType.ButtonLock);
                     ShowLevelLockedNotification();
                     break;
                 case LevelStatus.Unlocked:
                 case LevelStatus.Completed:
+                    SoundManager.Instance.PlayEffect(SoundType.ButtonClick);
                     SceneManager.LoadScene(levelIndex + 1);
                     break;
             }
         }
         else if (buttonType == "Back")
         {
+            SoundManager.Instance.PlayEffect(SoundType.ButtonQuit);
             SceneManager.LoadScene(0);
         }
     }

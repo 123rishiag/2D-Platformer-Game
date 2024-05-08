@@ -18,10 +18,12 @@ public class LobbyController : MonoBehaviour
     }
     private void PlayGame()
     {
+        SoundManager.Instance.PlayEffect(SoundType.ButtonClick);
         lobbyGameObject.SetActive(true);
     }
     private void QuitGame()
     {
+        SoundManager.Instance.PlayEffect(SoundType.ButtonQuit);
         if (UnityEditor.EditorApplication.isPlaying)
         {
             UnityEditor.EditorApplication.isPlaying = false;
