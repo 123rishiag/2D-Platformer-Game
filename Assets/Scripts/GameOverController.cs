@@ -20,11 +20,13 @@ public class GameOverController : MonoBehaviour
     }
     private void ReloadScene()
     {
+        SoundManager.Instance.PlayEffect(SoundType.ButtonClick);
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex);
     }
     private void QuitScene()
     {
+        SoundManager.Instance.PlayEffect(SoundType.ButtonQuit);
         gameObject.SetActive(false);
         SceneManager.LoadScene(0);
     }

@@ -3859,7 +3859,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1571091763}
   - component: {fileID: 1571091762}
-  - component: {fileID: 1571091761}
   - component: {fileID: 1571091764}
   m_Layer: 0
   m_Name: Main Camera
@@ -3868,14 +3867,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &1571091761
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1571091760}
-  m_Enabled: 1
 --- !u!20 &1571091762
 Camera:
   m_ObjectHideFlags: 0
@@ -4030,6 +4021,10 @@ PrefabInstance:
     - target: {fileID: 148999669, guid: 5a0724873ab90294d984ededb82ac595, type: 3}
       propertyPath: moveSpeed
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 148999669, guid: 5a0724873ab90294d984ededb82ac595, type: 3}
+      propertyPath: patrolDistance
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 541553305779618063, guid: 5a0724873ab90294d984ededb82ac595,
         type: 3}
@@ -4260,6 +4255,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1496061553}
     m_Modifications:
+    - target: {fileID: 148999669, guid: 5a0724873ab90294d984ededb82ac595, type: 3}
+      propertyPath: patrolDistance
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 541553305779618063, guid: 5a0724873ab90294d984ededb82ac595,
         type: 3}
       propertyPath: m_RootOrder
@@ -4268,7 +4267,7 @@ PrefabInstance:
     - target: {fileID: 541553305779618063, guid: 5a0724873ab90294d984ededb82ac595,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7.15
+      value: 8.42
       objectReference: {fileID: 0}
     - target: {fileID: 541553305779618063, guid: 5a0724873ab90294d984ededb82ac595,
         type: 3}
