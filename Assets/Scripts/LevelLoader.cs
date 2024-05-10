@@ -34,6 +34,7 @@ public class LevelLoader : MonoBehaviour
                 case LevelStatus.Completed:
                     SoundManager.Instance.PlayEffect(SoundType.ButtonClick);
                     SceneManager.LoadScene(levelIndex + 1);
+                    SoundManager.Instance.PlayEffect(SoundType.LevelStart);
                     break;
             }
         }

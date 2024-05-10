@@ -14,6 +14,9 @@ public class SoundManager : MonoBehaviour
 
     public Sound[] sounds;
 
+    private float currentVolume;
+    public bool isMute = false;
+
     private void Awake()
     {
         if (instance == null)
@@ -30,10 +33,41 @@ public class SoundManager : MonoBehaviour
     private void Start()
     {
         PlayMusic(SoundType.BackgroundMusic);
+        currentVolume = soundMusic.volume;
     }
 
+    public void MuteGame()
+    {
+        isMute = !isMute;
+        if (isMute)
+        {
+            SetVolume(0.0f);
+        }
+        else
+        {
+            SetVolume(GetVolume());
+        }
+    }
+    private float GetVolume()
+    {
+        return currentVolume;
+    }
+    public void SetVolume(float newVolume)
+    {
+        if (newVolume == 0.0f)
+        {
+            currentVolume = soundMusic.volume;
+        }
+        else
+        {
+            currentVolume = newVolume;
+        }
+        soundEffect.volume = newVolume;
+        soundMusic.volume = newVolume;
+    }
     public void PlayMusic(SoundType soundType)
     {
+        if(isMute) { return; }
         AudioClip soundClip = GetSoundClip(soundType);
         if (soundClip != null)
         {
@@ -45,9 +79,9 @@ public class SoundManager : MonoBehaviour
             Debug.Log("Didnot find any Sound Clip for selected Sound Type");
         }
     }
-
     public void PlayEffect(SoundType soundType)
     {
+        if (isMute) { return; }
         AudioClip soundClip = GetSoundClip(soundType);
         if (soundClip != null) {
             for (int i = 0; i < 2; i++)
@@ -93,5 +127,8 @@ public enum SoundType
     PlayerDeath,
     PlayerHurt,
     PlayerJump,
-    ChomperMove
+    ChomperMove,
+    LevelSuccess,
+    LevelFail,
+    LevelStart
 }

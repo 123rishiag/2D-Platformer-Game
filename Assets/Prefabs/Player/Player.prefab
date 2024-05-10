@@ -165,6 +165,6 @@ MonoBehaviour:
   animator: {fileID: 8416918937957670042}
   maxHealth: 3
   moveSpeed: 4
-  jumpForce: 500
+  jumpForce: 70
   scoreController: {fileID: 0}
   gameOverController: {fileID: 0}
