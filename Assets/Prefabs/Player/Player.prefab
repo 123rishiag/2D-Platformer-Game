@@ -168,3 +168,4 @@ MonoBehaviour:
   jumpForce: 70
   scoreController: {fileID: 0}
   gameOverController: {fileID: 0}
+  particleSystemController: {fileID: 0}

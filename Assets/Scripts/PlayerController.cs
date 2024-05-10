@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
 
     public ScoreController scoreController;
     public GameOverController gameOverController;
+    public ParticleSystemController particleSystemController;
 
     void Start()
     {
@@ -73,6 +74,7 @@ public class PlayerController : MonoBehaviour
     {
         SoundManager.Instance.PlayEffect(SoundType.PlayerDeath);
         animator.SetTrigger("isDead");
+        particleSystemController.PlayFailParticleEffect();
         StartCoroutine(KillPlayerWait());
     }
     IEnumerator KillPlayerWait()
