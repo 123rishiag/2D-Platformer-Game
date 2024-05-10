@@ -43,6 +43,12 @@ public class LevelManager : MonoBehaviour
         {
             LevelManager.Instance.SetLevelStatus(currentSceneIndex + 1, LevelStatus.Unlocked);
         }
+        StartCoroutine(CompleteAndUnlockSceneWait());
+    }
+    IEnumerator CompleteAndUnlockSceneWait()
+    {
+        yield return new WaitForSeconds(0.5f);
+        SoundManager.Instance.PlayEffect(SoundType.LevelSuccess);
     }
     public LevelStatus GetLevelStatus(int levelNumber)
     {

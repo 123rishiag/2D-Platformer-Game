@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
 
     public ScoreController scoreController;
     public GameOverController gameOverController;
+    public ParticleSystemController particleSystemController;
 
     void Start()
     {
@@ -69,10 +70,17 @@ public class PlayerController : MonoBehaviour
             KillPlayer();
         }
     }
-    private void KillPlayer()
+    public void KillPlayer()
     {
         SoundManager.Instance.PlayEffect(SoundType.PlayerDeath);
         animator.SetTrigger("isDead");
+        particleSystemController.PlayFailParticleEffect();
+        StartCoroutine(KillPlayerWait());
+    }
+    IEnumerator KillPlayerWait()
+    {
+        yield return new WaitForSeconds(0.5f);
+        SoundManager.Instance.PlayEffect(SoundType.LevelFail);
     }
     private void ReturntoIdle()
     {
@@ -102,12 +110,13 @@ public class PlayerController : MonoBehaviour
             // Jump Movement
             isGrounded = GroundCheck();
             vertical = Input.GetAxisRaw("Vertical");
-            yMovement = vertical * jumpForce;
+            
             if (vertical > 0.0f && isGrounded)
             {
-                SoundManager.Instance.PlayEffect(SoundType.PlayerJump);
-                rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Force);
                 rb.velocity = new Vector2(rb.velocity.x, 0f);
+                yMovement = vertical * jumpForce;
+                SoundManager.Instance.PlayEffect(SoundType.PlayerJump);
+                rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Impulse);
             }
             animator.SetFloat("jumpForce", vertical);
         }

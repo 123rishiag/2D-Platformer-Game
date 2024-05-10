@@ -23,6 +23,7 @@ public class GameOverController : MonoBehaviour
         SoundManager.Instance.PlayEffect(SoundType.ButtonClick);
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex);
+        SoundManager.Instance.PlayEffect(SoundType.LevelStart);
     }
     private void QuitScene()
     {
