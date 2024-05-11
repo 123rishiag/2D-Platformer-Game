@@ -3,46 +3,56 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    #region Variables
+    // Player state variables
     private bool isFacingLeft = false;
     private bool isCrouching = false;
     private bool isGrounded = true;
-    private float lastCheckPositionY;
-    private float checkThreshold = 0.01f;
     private bool isJumping = false;
     private bool canDoubleJump = true;
+    private bool isShielded = false;
+    private bool isSpeedBoosted = false;
+
+    // Player health and movement variables
     private int currentHealth = 0;
     private float horizontal = 0.0f;
     private float xMovement = 0.0f;
     private float vertical = 0.0f;
     private float yMovement = 0.0f;
-    private float crouchingHeightRatio = 0.6f;
-    private float crouchingWidthSizeRatio = 0.7f;
-    private float crouchingWidthOffsetRatio = .025f;
-    public float doubleJumpCooldown = 0.5f;
-    private bool isShielded = false;
-    private bool isSpeedBoosted = false;
-    private float shieldTimeRemaining = 0;
-    private float speedBoostTimeRemaining = 0;
-    private Vector2 colliderOffsetOriginal = Vector2.zero;
-    private Vector2 colliderSizeOriginal = Vector2.zero;
-
-    public LayerMask groundLayer;
-    public float groundCheckDistance = 0.001f;
-
-    public Animator animator;
-    private CapsuleCollider2D capsuleCollider2D;
-    private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;
-
     public int maxHealth = 3;
     public float moveSpeed = 1.0f;
     public float jumpForce = 1.0f;
 
+    // Player effects and thresholds
+    private float shieldTimeRemaining = 0;
+    private float speedBoostTimeRemaining = 0;
+    private float lastCheckPositionY;
+    private float checkThreshold = 0.01f;
+    public float doubleJumpCooldown = 0.5f;
+    private float crouchingHeightRatio = 0.6f;
+    private float crouchingWidthSizeRatio = 0.7f;
+    private float crouchingWidthOffsetRatio = .025f;
+
+    // Collider configurations
+    private Vector2 colliderOffsetOriginal = Vector2.zero;
+    private Vector2 colliderSizeOriginal = Vector2.zero;
+
+    // Layer and distance for ground check
+    public LayerMask groundLayer;
+    public float groundCheckDistance = 0.001f;
+
+    // External references
+    public Animator animator;
     public ScoreController scoreController;
     public GameOverController gameOverController;
     public ParticleSystemController particleSystemController;
 
+    private CapsuleCollider2D capsuleCollider2D;
+    private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
+    #endregion
 
+    #region Unity Functions
     private void Awake()
     {
         capsuleCollider2D = GetComponent<CapsuleCollider2D>();
@@ -63,9 +73,12 @@ public class PlayerController : MonoBehaviour
         PlayerJump();
         PlayerCrouch();
     }
+    #endregion
 
+    #region Player State Updates
     private void UpdateStates()
     {
+        // Handles shield time decrement
         if (isShielded)
         {
             shieldTimeRemaining -= Time.deltaTime;
@@ -74,7 +87,7 @@ public class PlayerController : MonoBehaviour
                 isShielded = false;
             }
         }
-
+        // Handles speed boost time decrement
         if (isSpeedBoosted)
         {
             speedBoostTimeRemaining -= Time.deltaTime;
@@ -85,12 +98,14 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    #endregion
+
+    #region Player Actions
     public void ActivateShield()
     {
         isShielded = true;
         shieldTimeRemaining = 5.0f;
     }
-
     public void ActivateSpeedBoost()
     {
         if (!isSpeedBoosted)
@@ -100,7 +115,6 @@ public class PlayerController : MonoBehaviour
         isSpeedBoosted = true;
         speedBoostTimeRemaining = 5.0f;
     }
-
     public int GetHealth()
     {
         return currentHealth;
@@ -136,14 +150,6 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(2f);
         DisablePlayer();
     }
-    private void ReturntoIdle()
-    {
-        animator.SetTrigger("isIdle");
-    }
-    public void ReloadMenu()
-    {
-        gameOverController.ReloadMenu();
-    }
     public void DisablePlayer()
     {
         spriteRenderer.enabled = false;
@@ -152,9 +158,12 @@ public class PlayerController : MonoBehaviour
         animator.enabled = false;
         this.enabled = false;
     }
+    #endregion
+
+    #region Movement and Interaction Functions
     private void PlayerMovement()
     {
-        // Left and Right Movements
+        // Handles player horizontal movement
         horizontal = Input.GetAxisRaw("Horizontal");
         PlayerFacingDirection();
         if (!isCrouching)
@@ -168,39 +177,49 @@ public class PlayerController : MonoBehaviour
             animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
         }
     }
+    public void PickupKey()
+    {
+        SoundManager.Instance.PlayEffect(SoundType.ItemPickup);
+        scoreController.IncreaseScore(10);
+    }
+    private void ReturntoIdle()
+    {
+        animator.SetTrigger("isIdle");
+    }
+    public void ReloadMenu()
+    {
+        gameOverController.ReloadMenu();
+    }
     private void PlayerJump()
     {
-        if (!isCrouching)
+        // Handles player jumping logic
+        vertical = Input.GetAxisRaw("Vertical");
+        if (isGrounded && isJumping)
         {
-            // Jump Movement
-            vertical = Input.GetAxisRaw("Vertical");
-            if (isGrounded && isJumping)
-            {
-                isJumping = false;
-                animator.SetBool("isJumping", false);
-            }
+            isJumping = false;
+            animator.SetBool("isJumping", false);
+        }
+        if (isGrounded && !isJumping)
+        {
+            canDoubleJump = true;
+        }
+        if (vertical > 0.0f)
+        {
             if (isGrounded && !isJumping)
             {
-                canDoubleJump = true;
+                isJumping = true;
+                PerformJump();
+                animator.SetBool("isJumping", true);
             }
-            if (vertical > 0.0f)
+            else if (!isGrounded && canDoubleJump && isJumping)
             {
-                if (isGrounded && !isJumping)
-                {
-                    isJumping = true;
-                    PerformJump();
-                    animator.SetBool("isJumping", true);
-                }
-                else if (!isGrounded && canDoubleJump && isJumping)
-                {
-                    isJumping = true;
-                    PerformJump();
-                    StartCoroutine(DoubleJumpCooldown());
-                    animator.SetBool("isJumping", true);
-                }
+                isJumping = true;
+                PerformJump();
+                StartCoroutine(DoubleJumpCooldown());
+                animator.SetBool("isJumping", true);
             }
-            animator.SetBool("isJumping", isJumping);
         }
+        animator.SetBool("isJumping", isJumping);
     }
     IEnumerator DoubleJumpCooldown()
     {
@@ -214,9 +233,9 @@ public class PlayerController : MonoBehaviour
         SoundManager.Instance.PlayEffect(SoundType.PlayerJump);
         rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Impulse);
     }
-
     private void PlayerCrouch()
     {
+        // Handles player crouching logic
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             isCrouching = !isCrouching;
@@ -235,6 +254,7 @@ public class PlayerController : MonoBehaviour
     }
     private void PlayerFacingDirection()
     {
+        // Updates player facing direction based on horizontal movement
         if (horizontal < 0.0f)
         {
             if (!isFacingLeft)
@@ -256,6 +276,7 @@ public class PlayerController : MonoBehaviour
     }
     private void GroundCheck()
     {
+        // Verifies if player is on the ground
         if (Mathf.Abs(transform.position.y - lastCheckPositionY) > checkThreshold)
         {
             RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
@@ -263,10 +284,5 @@ public class PlayerController : MonoBehaviour
             lastCheckPositionY = transform.position.y;
         }
     }
-
-    internal void PickupKey()
-    {
-        SoundManager.Instance.PlayEffect(SoundType.ItemPickup);
-        scoreController.IncreaseScore(10);
-    }
+    #endregion
 }
