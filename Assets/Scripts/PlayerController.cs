@@ -85,18 +85,15 @@ public class PlayerController : MonoBehaviour
     public void KillPlayer()
     {
         SoundManager.Instance.PlayEffect(SoundType.PlayerDeath);
-        animator.SetTrigger("isDead");
         particleSystemController.PlayFailParticleEffect();
+        animator.SetTrigger("isDead");
+        SoundManager.Instance.PlayEffect(SoundType.LevelFail);
         StartCoroutine(KillPlayerWait());
-        spriteRenderer.enabled = false;
-        rb.simulated = false;
-        capsuleCollider2D.enabled = false;
     }
     IEnumerator KillPlayerWait()
     {
-        yield return new WaitForSeconds(0.5f);
-        SoundManager.Instance.PlayEffect(SoundType.LevelFail);
-        
+        yield return new WaitForSeconds(2f);
+        DisablePlayer();
     }
     private void ActivateShield()
     {
@@ -112,11 +109,17 @@ public class PlayerController : MonoBehaviour
     {
         animator.SetTrigger("isIdle");
     }
-    private void ReloadMenu()
+    public void ReloadMenu()
     {
+        gameOverController.ReloadMenu();
+    }
+    public void DisablePlayer()
+    {
+        spriteRenderer.enabled = false;
+        rb.simulated = false;
+        capsuleCollider2D.enabled = false;
         animator.enabled = false;
         this.enabled = false;
-        gameOverController.ReloadMenu();
     }
     private void PlayerMovement()
     {
