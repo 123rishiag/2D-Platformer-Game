@@ -32,16 +32,13 @@ public class LevelLoader : MonoBehaviour
                     break;
                 case LevelStatus.Unlocked:
                 case LevelStatus.Completed:
-                    SoundManager.Instance.PlayEffect(SoundType.ButtonClick);
-                    SceneManager.LoadScene(levelIndex + 1);
-                    SoundManager.Instance.PlayEffect(SoundType.LevelStart);
+                    SceneManagerUtility.LoadScene(levelIndex + 1);
                     break;
             }
         }
         else if (buttonType == "Back")
         {
-            SoundManager.Instance.PlayEffect(SoundType.ButtonQuit);
-            SceneManager.LoadScene(0);
+            SceneManagerUtility.LoadMainMenu();
         }
     }
 

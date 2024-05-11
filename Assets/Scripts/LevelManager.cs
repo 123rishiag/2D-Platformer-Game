@@ -22,7 +22,12 @@ public class LevelManager : MonoBehaviour
     }
     private void Start()
     {
-        for (int currentLevel = 1; currentLevel <= SceneManager.sceneCountInBuildSettings - 1; currentLevel++) 
+        InitializeLevels();
+    }
+
+    private void InitializeLevels()
+    {
+        for (int currentLevel = 1; currentLevel <= SceneManager.sceneCountInBuildSettings - 1; currentLevel++)
         {
             if (currentLevel == 1)
             {
@@ -36,12 +41,11 @@ public class LevelManager : MonoBehaviour
     }
     public void CompleteAndUnlockScene()
     {
-        SoundManager.Instance.PlayEffect(SoundType.ButtonClick);
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        LevelManager.Instance.SetLevelStatus(currentSceneIndex, LevelStatus.Completed);
+        SetLevelStatus(currentSceneIndex, LevelStatus.Completed);
         if ((currentSceneIndex + 1) < SceneManager.sceneCountInBuildSettings)
         {
-            LevelManager.Instance.SetLevelStatus(currentSceneIndex + 1, LevelStatus.Unlocked);
+            SetLevelStatus(currentSceneIndex + 1, LevelStatus.Unlocked);
         }
         StartCoroutine(CompleteAndUnlockSceneWait());
     }
