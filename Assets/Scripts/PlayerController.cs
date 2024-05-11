@@ -1,16 +1,13 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.ShortcutManagement;
 using UnityEngine;
-using UnityEngine.Purchasing;
-using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     private bool isFacingLeft = false;
     private bool isCrouching = false;
     private bool isGrounded = true;
+    private float lastCheckPositionY;
+    private float checkThreshold = 0.01f;
     private bool isJumping = false;
     private bool canDoubleJump = true;
     private int currentHealth = 0;
@@ -22,7 +19,10 @@ public class PlayerController : MonoBehaviour
     private float crouchingWidthSizeRatio = 0.7f;
     private float crouchingWidthOffsetRatio = .025f;
     public float doubleJumpCooldown = 0.5f;
-    private bool isShieldActive = false;
+    private bool isShielded = false;
+    private bool isSpeedBoosted = false;
+    private float shieldTimeRemaining = 0;
+    private float speedBoostTimeRemaining = 0;
     private Vector2 colliderOffsetOriginal = Vector2.zero;
     private Vector2 colliderSizeOriginal = Vector2.zero;
 
@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
     public GameOverController gameOverController;
     public ParticleSystemController particleSystemController;
 
+
     private void Awake()
     {
         capsuleCollider2D = GetComponent<CapsuleCollider2D>();
@@ -56,19 +57,59 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        UpdateStates();
         PlayerMovement();
+        GroundCheck();
         PlayerJump();
         PlayerCrouch();
     }
+
+    private void UpdateStates()
+    {
+        if (isShielded)
+        {
+            shieldTimeRemaining -= Time.deltaTime;
+            if (shieldTimeRemaining <= 0)
+            {
+                isShielded = false;
+            }
+        }
+
+        if (isSpeedBoosted)
+        {
+            speedBoostTimeRemaining -= Time.deltaTime;
+            if (speedBoostTimeRemaining <= 0)
+            {
+                moveSpeed /= 2;
+                isSpeedBoosted = false;
+            }
+        }
+    }
+    public void ActivateShield()
+    {
+        isShielded = true;
+        shieldTimeRemaining = 5.0f;
+    }
+
+    public void ActivateSpeedBoost()
+    {
+        if (!isSpeedBoosted)
+        {
+            moveSpeed *= 2;
+        }
+        isSpeedBoosted = true;
+        speedBoostTimeRemaining = 5.0f;
+    }
+
     public int GetHealth()
     {
         return currentHealth;
     }
-    public void DecreaseHealth() 
+    public void DecreaseHealth()
     {
-        if(isShieldActive)
+        if (isShielded)
             return;
-        if(currentHealth > 1)
+        if (currentHealth > 1)
         {
             currentHealth -= 1;
             SoundManager.Instance.PlayEffect(SoundType.PlayerHurt);
@@ -94,16 +135,6 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         DisablePlayer();
-    }
-    private void ActivateShield()
-    {
-        isShieldActive = true;
-        StartCoroutine(DeactivateShieldAfterTime(5)); // Shield lasts for 5 seconds
-    }
-    IEnumerator DeactivateShieldAfterTime(float shieldSeconds)
-    {
-        yield return new WaitForSeconds(shieldSeconds);
-        isShieldActive = false;
     }
     private void ReturntoIdle()
     {
@@ -134,25 +165,14 @@ public class PlayerController : MonoBehaviour
                 SoundManager.Instance.PlayEffect(SoundType.PlayerMove);
             }
             transform.position = new Vector3(transform.position.x + xMovement, transform.position.y, 0.0f);
-            animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));           
+            animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
         }
-    }
-    public void ActivateSpeedBoost()
-    {
-        StartCoroutine(SpeedBoost(5));
-    }
-    IEnumerator SpeedBoost(float boostDuration)
-    {
-        moveSpeed *= 2;
-        yield return new WaitForSeconds(boostDuration);
-        moveSpeed /= 2;
     }
     private void PlayerJump()
     {
         if (!isCrouching)
         {
             // Jump Movement
-            isGrounded = GroundCheck();
             vertical = Input.GetAxisRaw("Vertical");
             if (isGrounded && isJumping)
             {
@@ -234,13 +254,14 @@ public class PlayerController : MonoBehaviour
             isFacingLeft = false;
         }
     }
-    bool GroundCheck()
+    private void GroundCheck()
     {
-        // Cast a ray downward to check for ground
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
-
-        // If the ray hits something on the ground layer, return true
-        return hit.collider != null;
+        if (Mathf.Abs(transform.position.y - lastCheckPositionY) > checkThreshold)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
+            isGrounded = hit.collider != null;
+            lastCheckPositionY = transform.position.y;
+        }
     }
 
     internal void PickupKey()

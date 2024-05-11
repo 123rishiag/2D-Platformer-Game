@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.VFX;
 
 public class SoundManager : MonoBehaviour
 {
@@ -67,7 +64,7 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayMusic(SoundType soundType)
     {
-        if(isMute) { return; }
+        if (isMute) { return; }
         AudioClip soundClip = GetSoundClip(soundType);
         if (soundClip != null)
         {
@@ -76,14 +73,15 @@ public class SoundManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Didnot find any Sound Clip for selected Sound Type");
+            Debug.Log("Did not find any Sound Clip for selected Sound Type");
         }
     }
     public void PlayEffect(SoundType soundType)
     {
         if (isMute) { return; }
         AudioClip soundClip = GetSoundClip(soundType);
-        if (soundClip != null) {
+        if (soundClip != null)
+        {
             for (int i = 0; i < 2; i++)
             {
                 soundEffect.PlayOneShot(soundClip);
@@ -91,14 +89,14 @@ public class SoundManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Didnot find any Sound Clip for selected Sound Type");
+            Debug.Log("Did not find any Sound Clip for selected Sound Type");
         }
     }
 
     private AudioClip GetSoundClip(SoundType soundType)
     {
-        Sound sound = Array.Find(sounds, item=>item.soundType == soundType);
-        if(sound != null)
+        Sound sound = Array.Find(sounds, item => item.soundType == soundType);
+        if (sound != null)
         {
             return sound.soundClip;
         }
