@@ -30,5 +30,6 @@ public class GameOverController : MonoBehaviour
         SoundManager.Instance.PlayEffect(SoundType.ButtonQuit);
         gameObject.SetActive(false);
         SceneManager.LoadScene(0);
+        SoundManager.Instance.PlayMusic(SoundType.BackgroundMusic);
     }
 }

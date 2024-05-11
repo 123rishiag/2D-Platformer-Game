@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     private bool isFacingLeft = false;
     private bool isCrouching = false;
     private bool isGrounded = true;
+    private bool isJumping = false;
+    private bool canDoubleJump = true;
     private int currentHealth = 0;
     private float horizontal = 0.0f;
     private float xMovement = 0.0f;
@@ -19,6 +21,8 @@ public class PlayerController : MonoBehaviour
     private float crouchingHeightRatio = 0.6f;
     private float crouchingWidthSizeRatio = 0.7f;
     private float crouchingWidthOffsetRatio = .025f;
+    public float doubleJumpCooldown = 0.5f;
+    private bool isShieldActive = false;
     private Vector2 colliderOffsetOriginal = Vector2.zero;
     private Vector2 colliderSizeOriginal = Vector2.zero;
 
@@ -28,6 +32,7 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     private CapsuleCollider2D capsuleCollider2D;
     private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
 
     public int maxHealth = 3;
     public float moveSpeed = 1.0f;
@@ -37,10 +42,14 @@ public class PlayerController : MonoBehaviour
     public GameOverController gameOverController;
     public ParticleSystemController particleSystemController;
 
-    void Start()
+    private void Awake()
     {
         capsuleCollider2D = GetComponent<CapsuleCollider2D>();
         rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+    private void Start()
+    {
         colliderSizeOriginal = capsuleCollider2D.size;
         colliderOffsetOriginal = capsuleCollider2D.offset;
         currentHealth = maxHealth;
@@ -48,49 +57,69 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         PlayerMovement();
+        PlayerJump();
         PlayerCrouch();
     }
-
     public int GetHealth()
     {
         return currentHealth;
     }
     public void DecreaseHealth() 
     {
-        if (currentHealth > 0) {
-            currentHealth -= 1;
-        }
-        if(currentHealth > 0)
+        if(isShieldActive)
+            return;
+        if(currentHealth > 1)
         {
+            currentHealth -= 1;
             SoundManager.Instance.PlayEffect(SoundType.PlayerHurt);
             animator.SetTrigger("isHurt");
+            ActivateShield();
+            ActivateSpeedBoost();
         }
         else
         {
+            currentHealth -= 1;
             KillPlayer();
         }
     }
     public void KillPlayer()
     {
         SoundManager.Instance.PlayEffect(SoundType.PlayerDeath);
-        animator.SetTrigger("isDead");
         particleSystemController.PlayFailParticleEffect();
+        animator.SetTrigger("isDead");
+        SoundManager.Instance.PlayEffect(SoundType.LevelFail);
         StartCoroutine(KillPlayerWait());
     }
     IEnumerator KillPlayerWait()
     {
-        yield return new WaitForSeconds(0.5f);
-        SoundManager.Instance.PlayEffect(SoundType.LevelFail);
+        yield return new WaitForSeconds(2f);
+        DisablePlayer();
+    }
+    private void ActivateShield()
+    {
+        isShieldActive = true;
+        StartCoroutine(DeactivateShieldAfterTime(5)); // Shield lasts for 5 seconds
+    }
+    IEnumerator DeactivateShieldAfterTime(float shieldSeconds)
+    {
+        yield return new WaitForSeconds(shieldSeconds);
+        isShieldActive = false;
     }
     private void ReturntoIdle()
     {
         animator.SetTrigger("isIdle");
     }
-    private void ReloadMenu()
+    public void ReloadMenu()
     {
+        gameOverController.ReloadMenu();
+    }
+    public void DisablePlayer()
+    {
+        spriteRenderer.enabled = false;
+        rb.simulated = false;
+        capsuleCollider2D.enabled = false;
         animator.enabled = false;
         this.enabled = false;
-        gameOverController.ReloadMenu();
     }
     private void PlayerMovement()
     {
@@ -105,22 +134,67 @@ public class PlayerController : MonoBehaviour
                 SoundManager.Instance.PlayEffect(SoundType.PlayerMove);
             }
             transform.position = new Vector3(transform.position.x + xMovement, transform.position.y, 0.0f);
-            animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
-
+            animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));           
+        }
+    }
+    public void ActivateSpeedBoost()
+    {
+        StartCoroutine(SpeedBoost(5));
+    }
+    IEnumerator SpeedBoost(float boostDuration)
+    {
+        moveSpeed *= 2;
+        yield return new WaitForSeconds(boostDuration);
+        moveSpeed /= 2;
+    }
+    private void PlayerJump()
+    {
+        if (!isCrouching)
+        {
             // Jump Movement
             isGrounded = GroundCheck();
             vertical = Input.GetAxisRaw("Vertical");
-            
-            if (vertical > 0.0f && isGrounded)
+            if (isGrounded && isJumping)
             {
-                rb.velocity = new Vector2(rb.velocity.x, 0f);
-                yMovement = vertical * jumpForce;
-                SoundManager.Instance.PlayEffect(SoundType.PlayerJump);
-                rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Impulse);
+                isJumping = false;
+                animator.SetBool("isJumping", false);
             }
-            animator.SetFloat("jumpForce", vertical);
+            if (isGrounded && !isJumping)
+            {
+                canDoubleJump = true;
+            }
+            if (vertical > 0.0f)
+            {
+                if (isGrounded && !isJumping)
+                {
+                    isJumping = true;
+                    PerformJump();
+                    animator.SetBool("isJumping", true);
+                }
+                else if (!isGrounded && canDoubleJump && isJumping)
+                {
+                    isJumping = true;
+                    PerformJump();
+                    StartCoroutine(DoubleJumpCooldown());
+                    animator.SetBool("isJumping", true);
+                }
+            }
+            animator.SetBool("isJumping", isJumping);
         }
     }
+    IEnumerator DoubleJumpCooldown()
+    {
+        yield return new WaitForSeconds(doubleJumpCooldown);
+        canDoubleJump = false;
+    }
+    private void PerformJump()
+    {
+        rb.velocity = new Vector2(rb.velocity.x, 0f);
+        yMovement = vertical * jumpForce;
+        SoundManager.Instance.PlayEffect(SoundType.PlayerJump);
+        rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Impulse);
+    }
+
     private void PlayerCrouch()
     {
         if (Input.GetKeyDown(KeyCode.LeftControl))
