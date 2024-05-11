@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     private bool isFacingLeft = false;
     private bool isCrouching = false;
     private bool isGrounded = true;
+    private bool isJumping = false;
+    private bool canDoubleJump = true;
     private int currentHealth = 0;
     private float horizontal = 0.0f;
     private float xMovement = 0.0f;
@@ -19,6 +21,7 @@ public class PlayerController : MonoBehaviour
     private float crouchingHeightRatio = 0.6f;
     private float crouchingWidthSizeRatio = 0.7f;
     private float crouchingWidthOffsetRatio = .025f;
+    public float doubleJumpCooldown = 0.5f;
     private Vector2 colliderOffsetOriginal = Vector2.zero;
     private Vector2 colliderSizeOriginal = Vector2.zero;
 
@@ -48,6 +51,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         PlayerMovement();
+        PlayerJump();
         PlayerCrouch();
     }
 
@@ -57,16 +61,15 @@ public class PlayerController : MonoBehaviour
     }
     public void DecreaseHealth() 
     {
-        if (currentHealth > 0) {
-            currentHealth -= 1;
-        }
-        if(currentHealth > 0)
+        if(currentHealth > 1)
         {
+            currentHealth -= 1;
             SoundManager.Instance.PlayEffect(SoundType.PlayerHurt);
             animator.SetTrigger("isHurt");
         }
         else
         {
+            currentHealth -= 1;
             KillPlayer();
         }
     }
@@ -105,22 +108,57 @@ public class PlayerController : MonoBehaviour
                 SoundManager.Instance.PlayEffect(SoundType.PlayerMove);
             }
             transform.position = new Vector3(transform.position.x + xMovement, transform.position.y, 0.0f);
-            animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));
-
+            animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));           
+        }
+    }
+    private void PlayerJump()
+    {
+        if (!isCrouching)
+        {
             // Jump Movement
             isGrounded = GroundCheck();
             vertical = Input.GetAxisRaw("Vertical");
-            
-            if (vertical > 0.0f && isGrounded)
+            if (isGrounded && isJumping)
             {
-                rb.velocity = new Vector2(rb.velocity.x, 0f);
-                yMovement = vertical * jumpForce;
-                SoundManager.Instance.PlayEffect(SoundType.PlayerJump);
-                rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Impulse);
+                isJumping = false;
+                animator.SetBool("isJumping", false);
             }
-            animator.SetFloat("jumpForce", vertical);
+            if (isGrounded && !isJumping)
+            {
+                canDoubleJump = true;
+            }
+            if (vertical > 0.0f)
+            {
+                if (isGrounded && !isJumping)
+                {
+                    isJumping = true;
+                    PerformJump();
+                    animator.SetBool("isJumping", true);
+                }
+                else if (!isGrounded && canDoubleJump && isJumping)
+                {
+                    isJumping = true;
+                    PerformJump();
+                    StartCoroutine(DoubleJumpCooldown());
+                    animator.SetBool("isJumping", true);
+                }
+            }
+            animator.SetBool("isJumping", isJumping);
         }
     }
+    IEnumerator DoubleJumpCooldown()
+    {
+        yield return new WaitForSeconds(doubleJumpCooldown);
+        canDoubleJump = false;
+    }
+    private void PerformJump()
+    {
+        rb.velocity = new Vector2(rb.velocity.x, 0f);
+        yMovement = vertical * jumpForce;
+        SoundManager.Instance.PlayEffect(SoundType.PlayerJump);
+        rb.AddForce(new Vector2(0.0f, yMovement), ForceMode2D.Impulse);
+    }
+
     private void PlayerCrouch()
     {
         if (Input.GetKeyDown(KeyCode.LeftControl))

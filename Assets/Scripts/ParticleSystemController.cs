@@ -15,7 +15,6 @@ public class ParticleSystemController : MonoBehaviour
     {
         if (currentFailureEffect != null)
         {
-            Debug.Log("It exists");
             currentFailureEffect.Play();
         }
         else
