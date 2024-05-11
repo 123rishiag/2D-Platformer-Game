@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     private CapsuleCollider2D capsuleCollider2D;
     private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
 
     public int maxHealth = 3;
     public float moveSpeed = 1.0f;
@@ -41,10 +42,14 @@ public class PlayerController : MonoBehaviour
     public GameOverController gameOverController;
     public ParticleSystemController particleSystemController;
 
-    void Start()
+    private void Awake()
     {
         capsuleCollider2D = GetComponent<CapsuleCollider2D>();
         rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+    private void Start()
+    {
         colliderSizeOriginal = capsuleCollider2D.size;
         colliderOffsetOriginal = capsuleCollider2D.offset;
         currentHealth = maxHealth;
@@ -69,6 +74,7 @@ public class PlayerController : MonoBehaviour
             SoundManager.Instance.PlayEffect(SoundType.PlayerHurt);
             animator.SetTrigger("isHurt");
             ActivateShield();
+            ActivateSpeedBoost();
         }
         else
         {
@@ -82,11 +88,15 @@ public class PlayerController : MonoBehaviour
         animator.SetTrigger("isDead");
         particleSystemController.PlayFailParticleEffect();
         StartCoroutine(KillPlayerWait());
+        spriteRenderer.enabled = false;
+        rb.simulated = false;
+        capsuleCollider2D.enabled = false;
     }
     IEnumerator KillPlayerWait()
     {
         yield return new WaitForSeconds(0.5f);
         SoundManager.Instance.PlayEffect(SoundType.LevelFail);
+        
     }
     private void ActivateShield()
     {
@@ -123,6 +133,16 @@ public class PlayerController : MonoBehaviour
             transform.position = new Vector3(transform.position.x + xMovement, transform.position.y, 0.0f);
             animator.SetFloat("moveSpeed", Mathf.Abs(horizontal));           
         }
+    }
+    public void ActivateSpeedBoost()
+    {
+        StartCoroutine(SpeedBoost(5));
+    }
+    IEnumerator SpeedBoost(float boostDuration)
+    {
+        moveSpeed *= 2;
+        yield return new WaitForSeconds(boostDuration);
+        moveSpeed /= 2;
     }
     private void PlayerJump()
     {
