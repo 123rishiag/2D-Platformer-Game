@@ -39,11 +39,6 @@ public class LobbyController : MonoBehaviour
     }
     private void QuitGame()
     {
-        SoundManager.Instance.PlayEffect(SoundType.ButtonQuit);
-        if (UnityEditor.EditorApplication.isPlaying)
-        {
-            UnityEditor.EditorApplication.isPlaying = false;
-        }
-        Application.Quit();
+        SceneManagerUtility.QuitGame();
     }
 }
