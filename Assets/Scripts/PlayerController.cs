@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private float crouchingWidthSizeRatio = 0.7f;
     private float crouchingWidthOffsetRatio = .025f;
     public float doubleJumpCooldown = 0.5f;
+    private bool isShieldActive = false;
     private Vector2 colliderOffsetOriginal = Vector2.zero;
     private Vector2 colliderSizeOriginal = Vector2.zero;
 
@@ -54,18 +55,20 @@ public class PlayerController : MonoBehaviour
         PlayerJump();
         PlayerCrouch();
     }
-
     public int GetHealth()
     {
         return currentHealth;
     }
     public void DecreaseHealth() 
     {
+        if(isShieldActive)
+            return;
         if(currentHealth > 1)
         {
             currentHealth -= 1;
             SoundManager.Instance.PlayEffect(SoundType.PlayerHurt);
             animator.SetTrigger("isHurt");
+            ActivateShield();
         }
         else
         {
@@ -84,6 +87,16 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         SoundManager.Instance.PlayEffect(SoundType.LevelFail);
+    }
+    private void ActivateShield()
+    {
+        isShieldActive = true;
+        StartCoroutine(DeactivateShieldAfterTime(5)); // Shield lasts for 5 seconds
+    }
+    IEnumerator DeactivateShieldAfterTime(float shieldSeconds)
+    {
+        yield return new WaitForSeconds(shieldSeconds);
+        isShieldActive = false;
     }
     private void ReturntoIdle()
     {
