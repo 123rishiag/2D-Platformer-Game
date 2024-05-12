@@ -268,7 +268,7 @@ public class PlayerController : MonoBehaviour
     private void PlayerCrouch()
     {
         // Toggle player crouching state and adjust collider.
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (Input.GetKeyDown(KeyCode.LeftControl) && isGrounded && horizontal == 0.0f)
         {
             isCrouching = !isCrouching; // Toggle crouching state.
             if (isCrouching)
