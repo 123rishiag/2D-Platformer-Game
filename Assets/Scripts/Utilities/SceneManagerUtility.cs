@@ -43,13 +43,14 @@ public static class SceneManagerUtility
         // Play a sound effect for the quit action.
         SoundManager.Instance.PlayEffect(SoundType.ButtonQuit);
         // Check if the application is running in the Unity Editor.
-        if (UnityEditor.EditorApplication.isPlaying)
+#if UNITY_EDITOR
         {
             // Stop playing the scene in the Unity Editor.
             UnityEditor.EditorApplication.isPlaying = false;
         }
-        // Quit the application.
+#else
         Application.Quit();
+#endif
     }
     #endregion
 }
